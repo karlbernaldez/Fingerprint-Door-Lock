@@ -11,6 +11,7 @@ from pymongo.errors import CollectionInvalid, DuplicateKeyError
 
 from camera_utils import generate_frames, get_face_id, take_screenshot_from_camera
 from validation_schema import user_validation_schema
+from werkzeug.security import generate_password_hash
 
 
 app = Flask(__name__)
@@ -53,33 +54,31 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        screenshot = take_screenshot_from_camera(request.form.get("email"))
-        # check whether screenshot file is saved
-        if screenshot:
+        try:
+            screenshot = take_screenshot_from_camera(request.form.get("email"))
             face_id = get_face_id(screenshot)
-            # check whether face recognition succeeded
-            if len(face_id) != 0:
-                try:
-                    add_user = users.insert_one(
-                        {
-                            "email": request.form.get("email"),
-                            "password": request.form.get("password"),
-                            "image": f"user_screenshots/{request.form.get('email')}",
-                            "face_id": Binary(pickle.dumps(face_id, protocol=2), subtype=128),
-                            "date": datetime.utcnow(),
-                        }
-                    )
-                    # check whether data inserting succeeded
-                    if add_user:
-                        return redirect(url_for("protected"))
-                    flash("Error. Cannot save data to DB.")
-                except DuplicateKeyError:
-                    flash("The given email already exists.")
-
+            if screenshot and face_id:
+                user_data = {
+                    "email": request.form.get("email"),
+                    "password": generate_password_hash(request.form.get("password")),
+                    "image": f"user_screenshots/{request.form.get('email')}",
+                    "face_id": Binary(pickle.dumps(face_id, protocol=2), subtype=128),
+                    "date": datetime.utcnow(),
+                }
+                add_user = users.insert_one(user_data)
+                if add_user:
+                    app.logger.error(f"add_user: {add_user}")
+                    return redirect(url_for("protected"))
+                flash("Error. Cannot save data to DB.")
             else:
+                app.logger.error(f"screenshot: {screenshot}")
+                app.logger.error(f"face_id: {face_id}")
                 flash("Cannot get face encoding, retake picture.")
-        else:
-            flash("Cannot find screenshot file.")
+        except DuplicateKeyError:
+            flash("The given email already exists.")
+        except Exception as error:
+            app.logger.error(f"An error occurred while registering a user: {error}")
+            flash("An error occurred while registering. Please try again later.")
     return render_template("register.html")
 
 

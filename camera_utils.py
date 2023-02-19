@@ -15,7 +15,7 @@ def get_face_id(img_file: str) -> list[ndarray]:
     try:
         image = fr.load_image_file(img_file)
         face_id = fr.face_encodings(image)[0]
-        return face_id
+        return face_id.tolist()
     except (IndexError, AttributeError):
         return []
 

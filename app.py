@@ -1,16 +1,20 @@
 """Main start app file."""
 
 import os
+import pickle
 from datetime import datetime
 
-from flask import Flask, Response, redirect, render_template, request
+from bson.binary import Binary
+from flask import Flask, Response, flash, redirect, render_template, request, url_for
 from pymongo import MongoClient
-from pymongo.errors import CollectionInvalid
+from pymongo.errors import CollectionInvalid, DuplicateKeyError
 
-from cam_utils import generate_frames
+from camera_utils import generate_frames, get_face_id, take_screenshot_from_camera
 from validation_schema import user_validation_schema
 
+
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", None)
 
 connection_string = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 client = MongoClient(connection_string)
@@ -41,7 +45,7 @@ def index():
 def login():
     if request.method == "POST":
         request.form.get("submit")
-        return redirect("/protected")
+        return redirect(url_for("protected"))
 
     return render_template("login.html")
 
@@ -49,18 +53,39 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        users.insert_one(
-            {
-                "email": request.form.get("email"),
-                "password": request.form.get("password"),
-                "image": request.form.get("photo"),
-                "face_id": [],
-                "date": datetime.utcnow(),
-            }
-        )
-        return redirect("/protected")
+        screenshot = take_screenshot_from_camera(request.form.get("email"))
+        # check whether screenshot file is saved
+        if screenshot:
+            face_id = get_face_id(screenshot)
+            # check whether face recognition succeeded
+            if len(face_id) != 0:
+                try:
+                    add_user = users.insert_one(
+                        {
+                            "email": request.form.get("email"),
+                            "password": request.form.get("password"),
+                            "image": f"user_screenshots/{request.form.get('email')}",
+                            "face_id": Binary(pickle.dumps(face_id, protocol=2), subtype=128),
+                            "date": datetime.utcnow(),
+                        }
+                    )
+                    # check whether data inserting succeeded
+                    if add_user:
+                        return redirect(url_for("protected"))
+                    flash("Error. Cannot save data to DB.")
+                except DuplicateKeyError:
+                    flash("The given email already exists.")
 
+            else:
+                flash("Cannot get face encoding, retake picture.")
+        else:
+            flash("Cannot find screenshot file.")
     return render_template("register.html")
+
+
+@app.route("/take_screenshot", methods=["POST"])
+def take_screenshot():
+    return take_screenshot_from_camera("test")
 
 
 @app.route("/protected")

@@ -8,10 +8,11 @@ user_validation_schema = {
         "properties": {
             "email": {
                 "bsonType": "string",
+                "minLength": 6,
                 "description": "must be an email and is required",
             },
             "password": {
-                "bsonType": "object",
+                "bsonType": "string",
                 "minLength": 8,
                 "description": "must be string with min length 8 symbols and is required",
             },
@@ -20,12 +21,8 @@ user_validation_schema = {
                 "description": "must be a link to image and is required",
             },
             "face_id": {
-                "bsonType": "array",
-                "description": "a list of arrays with face encodings",
-                "minItems": 1,
-                "items": {
-                    "bsonType": "array",
-                },
+                "bsonType": "binData",
+                "description": "pickled np.array type and is required",
             },
             "date": {
                 "bsonType": "date",

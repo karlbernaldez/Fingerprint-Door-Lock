@@ -19,12 +19,7 @@ from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid, DuplicateKeyError
 from werkzeug.security import generate_password_hash
 
-from camera_utils import (
-    check_face,
-    generate_frames,
-    get_face_id,
-    take_screenshot_from_camera,
-)
+from camera_utils import Camera
 from validation_schema import user_validation_schema
 
 app = Flask(__name__)
@@ -40,12 +35,14 @@ except CollectionInvalid as e:
 users = db.get_collection("users")
 users.create_index("email", unique=True)
 
+camera = Camera()
+
 
 @app.route("/video_feed")
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(
-        generate_frames(), mimetype="multipart/x-mixed-replace; boundary=frame"
+        camera.generate_frames(), mimetype="multipart/x-mixed-replace; boundary=frame"
     )
 
 
@@ -62,7 +59,7 @@ def login():
         user = users.find_one({"email": request.form.get("email")})
 
         if user:
-            result = check_face(pickle.loads(user["face_id"]))
+            result = camera.check_face(pickle.loads(user["face_id"]))
 
             if result:
                 session["user"] = user["email"]
@@ -79,8 +76,8 @@ def register():
     """Add new user to DB. Save a screenshot."""
     if request.method == "POST":
         try:
-            screenshot = take_screenshot_from_camera(request.form.get("email"))
-            face_id = get_face_id(screenshot)
+            screenshot = camera.take_screenshot_from_camera(request.form.get("email"))
+            face_id = camera.get_face_encoding(screenshot)
 
             if screenshot and face_id:
                 user_data = {

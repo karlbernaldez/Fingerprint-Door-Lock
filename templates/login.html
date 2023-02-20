@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+	        <form action="" method="post">
+		        <h3 class="mt-5">Live Streaming</h3>
+		        <img src="{{ url_for('video_feed') }}" width="50%" alt="cam">
+		        <label for="email">Email:</label>
+		        <input class="form-control" type="email" name="email" id="email" value="v@gmail.com"/>
+		        <input class="btn btn-primary mt-3" type="submit" value="Submit">
+	        </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,17 +1,32 @@
-"""."""
+"""Utilities to work with camera and face recognition."""
 
 from pathlib import Path
 
 import cv2
 import face_recognition as fr
-from numpy import ndarray
-
+import numpy as np
 
 camera = cv2.VideoCapture(0)
 
 
-def get_face_id(img_file: str) -> list[ndarray]:
-    """Create face encoding."""
+def check_face(known_face_encoding) -> bool:
+    """Check if face encoding is the same as in the DB."""
+    success, frame = camera.read()
+    if success:
+        try:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            new_face_encoding = fr.face_encodings(frame)[0]
+            result = fr.compare_faces([known_face_encoding], new_face_encoding)
+
+            if not all(result):
+                return False
+            return True
+        except IndexError:
+            return False
+
+
+def get_face_id(img_file: str) -> list[np.ndarray]:
+    """Create face encoding from image on a disk."""
     try:
         image = fr.load_image_file(img_file)
         face_id = fr.face_encodings(image)[0]

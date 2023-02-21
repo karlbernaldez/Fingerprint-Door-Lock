@@ -59,7 +59,7 @@ def login():
         user = users.find_one({"email": request.form.get("email")})
 
         if user:
-            result = camera.check_face(pickle.loads(user["face_id"]))
+            result = camera.check_two_faces(pickle.loads(user["face_id"]))
 
             if result:
                 session["user"] = user["email"]
@@ -76,28 +76,30 @@ def register():
     """Add new user to DB. Save a screenshot."""
     if request.method == "POST":
         try:
-            screenshot = camera.take_screenshot_from_camera(request.form.get("email"))
-            face_id = camera.get_face_encoding(screenshot)
+            success, frame = camera.take_screenshot_from_camera()
+            face_encoding = camera.get_face_encoding(frame)
 
-            if screenshot and face_id:
+            if success and face_encoding:
                 user_data = {
                     "email": request.form.get("email"),
                     "password": generate_password_hash(request.form.get("password")),
                     "image": f"user_screenshots/{request.form.get('email')}",
-                    "face_id": Binary(pickle.dumps(face_id, protocol=2), subtype=128),
+                    "face_id": Binary(
+                        pickle.dumps(face_encoding, protocol=2), subtype=128
+                    ),
                     "date": datetime.utcnow(),
                 }
                 add_user = users.insert_one(user_data)
 
                 if add_user:
-                    app.logger.error(f"add_user: {add_user}")
+                    camera.save_screenshot_to_file(success, frame, request.form.get("email"))
                     return redirect(url_for("protected"))
 
                 flash("Error. Cannot save data to DB.")
 
             else:
-                app.logger.error(f"screenshot: {screenshot}")
-                app.logger.error(f"face_id: {face_id}")
+                app.logger.error(f"screenshot: {frame}")
+                app.logger.error(f"face_id: {face_encoding}")
                 flash("Cannot get face encoding, retake picture.")
 
         except DuplicateKeyError:

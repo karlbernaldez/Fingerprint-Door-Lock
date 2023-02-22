@@ -4,6 +4,7 @@ import os
 import pickle
 from datetime import datetime
 
+from bson import ObjectId
 from bson.binary import Binary
 from flask import (
     Flask,
@@ -17,7 +18,7 @@ from flask import (
 )
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid, DuplicateKeyError
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from camera_utils import Camera
 from validation_schema import user_validation_schema
@@ -54,19 +55,29 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Log the user in using face id."""
+    """Log the user in using face id and email or email and password."""
     if request.method == "POST":
-        user = users.find_one({"email": request.form.get("email")})
+        session.pop("user", None)
+        email = request.form.get("email")
+        password = request.form.get("password")
+        result = False
 
-        if user:
+        user = users.find_one({"email": email})
+
+        if not user:
+            flash("User with this email does not exist.")
+        elif user and password:
+            result = check_password_hash(user["password"], password)
+            print(result)
+        elif user:
             result = camera.check_two_faces(pickle.loads(user["face_id"]))
 
-            if result:
-                session["user"] = user["email"]
-                flash(f"Welcome, {user['email']}!")
-                return redirect(url_for("protected"))
-            else:
-                flash("Face ID does not match.")
+        if result:
+            session["user"] = user["email"]
+            flash(f"Welcome, {user['email']}!")
+            return redirect(url_for("profile", user_id=user["_id"]))
+        else:
+            flash("Wrong password or Face ID does not match.")
 
     return render_template("login.html")
 
@@ -83,7 +94,7 @@ def register():
                 user_data = {
                     "email": request.form.get("email"),
                     "password": generate_password_hash(request.form.get("password")),
-                    "image": f"user_screenshots/{request.form.get('email')}",
+                    "image": f"user_screenshots/{request.form.get('email')}.jpg",
                     "face_id": Binary(
                         pickle.dumps(face_encoding, protocol=2), subtype=128
                     ),
@@ -92,8 +103,10 @@ def register():
                 add_user = users.insert_one(user_data)
 
                 if add_user:
-                    camera.save_screenshot_to_file(success, frame, request.form.get("email"))
-                    return redirect(url_for("protected"))
+                    camera.save_screenshot_to_file(
+                        success, frame, request.form.get("email")
+                    )
+                    return redirect(url_for("profile", user_id=add_user.inserted_id))
 
                 flash("Error. Cannot save data to DB.")
 
@@ -112,9 +125,16 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/protected")
-def protected():
-    return render_template("protected.html")
+@app.route("/profile/<user_id>")
+def profile(user_id):
+    """User profile page."""
+    if "user" in session:
+        user = users.find_one(
+            {"_id": ObjectId(user_id)}, {"email": 1, "image": 1, "date": 1}
+        )
+        return render_template("profile.html", user=user)
+    flash("You are not logged in.")
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":

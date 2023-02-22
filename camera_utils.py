@@ -1,4 +1,5 @@
 """Utilities to work with camera and face recognition."""
+
 import os
 from pathlib import Path
 
@@ -35,7 +36,7 @@ class Camera:
         success: bool, frame: np.ndarray, username: str
     ) -> str | bool:
         """Save a screenshot to disk."""
-        screenshots_folder = Path("user_screenshots")
+        screenshots_folder = Path("static", "user_screenshots")
         screenshots_folder.mkdir(exist_ok=True)
 
         file_path = os.path.join(screenshots_folder, f"{username}.jpg")

@@ -4,7 +4,7 @@ user_validation_schema = {
     "$jsonSchema": {
         "bsonType": "object",
         "title": "User Object Validation",
-        "required": ["email", "password", "image", "face_id", "date"],
+        "required": ["email", "password", "fingerprint_id", "date"],
         "properties": {
             "email": {
                 "bsonType": "string",
@@ -14,15 +14,11 @@ user_validation_schema = {
             "password": {
                 "bsonType": "string",
                 "minLength": 8,
-                "description": "must be string with min length 8 symbols and is required",
+                "description": "must be a string with min length 8 symbols and is required",
             },
-            "image": {
-                "bsonType": "string",
-                "description": "must be a link to image and is required",
-            },
-            "face_id": {
+            "fingerprint_id": {
                 "bsonType": "binData",
-                "description": "pickled np.array type and is required",
+                "description": "pickled np.array type for fingerprint data and is required",
             },
             "date": {
                 "bsonType": "date",

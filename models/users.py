@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, BinaryField, IntField, DateTimeField, EmailField, BooleanField
+from mongoengine import Document, StringField, BinaryField, IntField, DateTimeField, EmailField, BooleanField, EnumField
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson import ObjectId
 from bson.binary import Binary
@@ -6,9 +6,14 @@ import datetime
 import pickle
 import jwt
 import os
+from enum import Enum
 
 # Secret key for JWT token
 SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key')
+
+class RoleEnum(Enum):
+    ADMIN = 'admin'
+    CLIENT = 'client'
 
 class User(Document):
     full_name = StringField(required=True, max_length=200)
@@ -20,6 +25,7 @@ class User(Document):
     active = BooleanField(default=False)  # Tracks if the user is currently logged in
     token = StringField()  # JWT token for login sessions
     last_login = DateTimeField()  # Tracks the last login time
+    role = EnumField(RoleEnum, required=True, default=RoleEnum.CLIENT)  # User role with default as CLIENT
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -54,4 +60,3 @@ class User(Document):
     def set_active(self, status):
         self.active = status
         self.save()
-    

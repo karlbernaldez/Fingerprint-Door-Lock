@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Fingerprint App{% endblock %}
+
+{% block content %}
+    <h1>User Profile</h1>
+    {% if user %}
+        <p>Email: {{ user.email }}</p>
+        <p>Registration Date: {{ user.date.strftime('%Y-%m-%d') }}</p>
+        <img src="{{ url_for('static', filename=user.image) }}" alt="User Image">
+    {% else %}
+        <p>User not found.</p>
+    {% endif %}
+{% endblock %}

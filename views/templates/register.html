@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Touch ID Registration</title>
+    <!-- Use url_for to link to static files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='rglobal.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" />
+    <style>
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            max-width: 400px;
+            margin: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .warning {
+            color: red;
+            font-weight: bold;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="register">
+        <div class="content">
+            <img class="content-child" loading="lazy" alt=""
+                src="{{ url_for('static', filename='public/group-2.svg') }}" />
+            <div class="bg-parent">
+                <div class="bg"></div>
+                <div class="finance-info">
+                    <h1 class="tech-titans">Tech Titans</h1>
+                    <div class="the-best-fingerprint">The best fingerprint locked door.</div>
+                </div>
+                <button class="read-more-wrapper">
+                    <div class="read-more">Read More</div>
+                </button>
+            </div>
+        </div>
+
+        <div class="registration">
+            <div class="signup-parent">
+                <div class="signup">
+                    <h2 class="eg">Touch ID Registration</h2>
+                    <div class="fill-up-the">Fill up the forms and scan your touch ID.</div>
+                </div>
+
+                <form class="credentials" method="POST" action="{{ url_for('register') }}" id="registrationForm">
+                    <div class="email">
+                        <img class="bxbxs-user-icon" alt=""
+                            src="{{ url_for('static', filename='public/bxbxsuser.svg') }}" />
+                        <input class="input-labels" name="full_name" placeholder="Full Name" type="text" required />
+                    </div>
+                    <div class="email1">
+                        <img class="codiconmail" alt=""
+                            src="{{ url_for('static', filename='public/codiconmail.svg') }}" />
+                        <input class="email-child" name="email" placeholder="Email Address" type="email" required />
+                        <div id="emailWarning" class="warning"></div> <!-- Warning for email -->
+                    </div>
+                    <div class="password">
+                        <img class="bxbxs-lock-alt-icon" alt=""
+                            src="{{ url_for('static', filename='public/bxbxslockalt.svg') }}" />
+                        <input class="password-child" name="password" placeholder="Password" type="password" required />
+                        <div id="passwordWarning" class="warning"></div> <!-- Warning for password -->
+                    </div>
+                    <button class="button" type="button" id="registerButton" onclick="showModal()" disabled>
+                        <div class="register-fingerprint">Click to register fingerprint.</div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fingerprint Scan Modal -->
+    <div id="fingerprintModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p>Please scan your fingerprint to complete the registration.</p>
+            <button onclick="submitFingerprint()">Enroll Fingerprint</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('input', function () {
+            const form = this;
+            const emailField = form.querySelector('input[name="email"]');
+            const passwordField = form.querySelector('input[name="password"]');
+            const emailValue = emailField.value.trim();
+            const passwordValue = passwordField.value.trim();
+
+            // Regex patterns
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email validation
+            const passwordPattern = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/; // Password validation
+
+            const isEmailValid = emailPattern.test(emailValue);
+            const isPasswordValid = passwordPattern.test(passwordValue);
+
+            // Check if all fields are filled
+            const isFormFilled = Array.from(form.elements).every(input => {
+                if (input.type !== "button") {
+                    return input.value.trim() !== '';
+                }
+                return true;
+            });
+
+            // Show warning messages if email or password is invalid
+            const emailWarning = document.getElementById('emailWarning');
+            const passwordWarning = document.getElementById('passwordWarning');
+
+            if (!isEmailValid && emailValue !== '') {
+                emailWarning.textContent = 'Please enter a valid email address.';
+            } else {
+                emailWarning.textContent = '';
+            }
+
+            if (!isPasswordValid && passwordValue !== '') {
+                passwordWarning.textContent = 'Password: 8+ chars, upper, lower, number, symbol.';
+            } else {
+                passwordWarning.textContent = '';
+            }
+
+            // Enable the button only if the form is filled, email is valid, and password is valid
+            document.getElementById('registerButton').disabled = !(isFormFilled && isEmailValid && isPasswordValid);
+        });
+
+        function showModal() {
+            const modal = document.getElementById('fingerprintModal');
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('fingerprintModal');
+            modal.style.display = "none";
+        }
+
+        function submitFingerprint() {
+            const button = document.querySelector('#fingerprintModal button');
+
+            // Disable the button and change its color
+            button.disabled = true;
+            button.style.backgroundColor = 'grey'; // Change to the desired color
+
+            // Optionally, change the text to indicate it's processing
+            button.textContent = 'Scanning...';
+
+            // Gather form data
+            const formData = new FormData(document.getElementById('registrationForm'));
+
+            fetch('{{ url_for("enroll_fingerprint") }}', {
+                method: 'POST',
+                body: formData // Send the form data along with the request
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Fingerprint enrolled successfully!');
+                        window.location.href = "{{ url_for('login') }}"; // Redirect to login after success
+                    } else {
+                        alert('Enrollment failed: ' + data.message);
+                        if (data.message === 'Fingerprint already exists') {
+                            closeModal(); // Close the modal if the fingerprint is already enrolled
+                        }
+                        // Re-enable the button if there's an error
+                        button.disabled = false;
+                        button.style.backgroundColor = ''; // Reset to the original color
+                        button.textContent = 'Enroll Fingerprint'; // Reset the text
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again later.');
+
+                    // Re-enable the button if there's an error
+                    button.disabled = false;
+                    button.style.backgroundColor = ''; // Reset to the original color
+                    button.textContent = 'Enroll Fingerprint'; // Reset the text
+                });
+        }
+
+    </script>
+</body>
+
+</html>

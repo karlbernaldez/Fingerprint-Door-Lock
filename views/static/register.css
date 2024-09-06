@@ -1,0 +1,452 @@
+/* General styling and positioning */
+.content-child {
+  height: 583px;
+  width: 638px;
+  position: absolute;
+  margin: 0 !important;
+  bottom: -303px;
+  left: -207px;
+  z-index: 1;
+}
+
+.bg {
+  width: 860px;
+  height: 900px;
+  position: relative;
+  background: linear-gradient(180deg, #0575e6, #03298a 84.79%, #021b79);
+  display: none;
+  max-width: 100%;
+}
+
+.tech-titans {
+  margin: 0;
+  position: relative;
+  font-size: inherit;
+  font-weight: 700;
+  font-family: inherit;
+  z-index: 1;
+}
+
+.the-best-fingerprint {
+  position: relative;
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+  z-index: 1;
+}
+
+/* Finance info layout */
+.finance-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+/* Read more button styling */
+.read-more {
+  position: relative;
+  font-size: var(--font-size-sm);
+  font-family: var(--font-poppins);
+  color: var(--white);
+  text-align: left;
+  display: inline-block;
+  min-width: 75px;
+}
+
+/* Button wrappers for alignment and interactivity */
+.bg-parent,
+.read-more-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.read-more-wrapper {
+  cursor: pointer;
+  border: 0;
+  padding: 8px 30px;
+  background-color: var(--color-royalblue);
+  border-radius: var(--br-11xl);
+  flex-direction: row;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.button:hover,
+.read-more-wrapper:hover {
+  background-color: var(--color-dodgerblue);
+}
+
+.bg-parent {
+  flex: 1;
+  background: linear-gradient(180deg, #0575e6, #03298a 84.79%, #021b79);
+  flex-direction: column;
+  padding: 371px 157px 382px;
+  box-sizing: border-box;
+  gap: 23px;
+  max-width: 100%;
+}
+
+/* Content positioning */
+.content,
+.eg {
+  position: relative;
+}
+
+.content {
+  width: 860px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-width: 860px;
+  max-width: 100%;
+}
+
+.eg {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.fill-up-the {
+  position: relative;
+  font-size: var(--font-size-lg);
+}
+
+.signup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 3px;
+}
+
+/* Icon styling */
+.bxbxs-user-icon {
+  margin-right: 5px;
+  height: 24px;
+  width: 24px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  min-height: 24px;
+}
+
+/* Email and input fields styling */
+.email,
+.input-labels {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.input-labels {
+  width: 100%;
+  /* Make input fields take full width */
+  border: 0.5px solid var(--color-whitesmoke);
+  outline: none;
+  background-color: transparent;
+  height: 40px;
+  /* Increase height */
+  padding: 10px 12px;
+  /* Increase padding for better UX */
+  box-sizing: border-box;
+  font-family: var(--font-poppins);
+  font-size: var(--font-size-md);
+  /* Increase font size */
+  color: var(--color-darkslategray-900);
+  /* Darker input text */
+}
+
+/* Email and password field container */
+
+
+.codiconmail {
+  margin-right: 5px;
+  height: 24px;
+  width: 24px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  min-height: 24px;
+}
+
+/* Adjusted email input field */
+.email-child,
+.email1 {
+  display: flex;
+  align-items: center;
+  /* Center-align content */
+  justify-content: flex-start;
+}
+
+.email-child {
+  width: 100%;
+  /* Make input fields take full width */
+  border: 0.5px solid var(--color-whitesmoke);
+  outline: none;
+  background-color: transparent;
+  height: 40px;
+  /* Increase height */
+  padding: 10px 12px;
+  /* Increase padding for better UX */
+  box-sizing: border-box;
+  font-family: var(--font-poppins);
+  font-size: var(--font-size-md);
+  /* Increase font size */
+  color: var(--color-darkslategray-900);
+  /* Darker input text */
+}
+
+/* Password icon and field */
+.bxbxs-lock-alt-icon {
+  margin-right: 5px;
+  height: 24px;
+  width: 24px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  min-height: 24px;
+}
+
+.password,
+.password-child {
+  display: flex;
+  align-items: center;
+  /* Center-align content */
+  justify-content: flex-start;
+}
+
+.password-child {
+  width: 100%;
+  /* Make input fields take full width */
+  border: 0.5px solid var(--color-whitesmoke);
+  outline: none;
+  background-color: transparent;
+  height: 40px;
+  /* Increase height */
+  padding: 10px 12px;
+  /* Increase padding for better UX */
+  box-sizing: border-box;
+  font-family: var(--font-poppins);
+  font-size: var(--font-size-md);
+  /* Increase font size */
+  color: var(--color-darkslategray-900);
+  /* Darker input text */
+}
+
+/* Button styling */
+.scan-your-fingerprint {
+  position: relative;
+  font-size: var(--font-size-md);
+  /* Adjusted font size */
+  font-family: var(--font-poppins);
+  color: var(--white);
+  text-align: left;
+}
+
+.button {
+  cursor: pointer;
+  border: 0;
+  padding: 18px 41px;
+  margin-left: 60px;
+  margin-top: 10px;
+  background-color: var(--color-royalblue);
+  border-radius: var(--br-11xl);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* Center-align button content */
+  justify-content: center;
+  /* Center-align button content */
+  white-space: nowrap;
+}
+
+/* Modal container */
+.modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Black background with opacity */
+  display: flex;
+  /* Use flexbox to center the content */
+  justify-content: center;
+  /* Center horizontally */
+  align-items: center;
+  /* Center vertically */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  /* Width of the modal */
+  max-width: 500px;
+  /* Maximum width of the modal */
+  max-height: 80%;
+  /* Ensure it doesn’t exceed the viewport height */
+  overflow-y: auto;
+  /* Add scrolling if content is too tall */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+
+
+
+
+/*------------------------------------------------------------------------------------------------------------------*/
+
+/* Form and parent container */
+.credentials,
+.signup-parent {
+  flex-direction: column;
+  max-width: 100%;
+}
+
+.credentials {
+  margin: 0;
+  width: 100%;
+  /* Make form full-width */
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0 var(--padding-xl) 0 0;
+  box-sizing: border-box;
+  gap: 16px;
+}
+
+.signup-parent {
+  gap: 40px;
+}
+
+/* Register and registration container */
+.register,
+.registration,
+.signup-parent {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.registration {
+  flex-direction: column;
+  padding: 253px 0 0;
+  box-sizing: border-box;
+  min-width: 358px;
+  max-width: 100%;
+  font-size: 26px;
+  color: var(--color-darkslategray-100);
+}
+
+.register {
+  width: 100%;
+  position: relative;
+  background-color: var(--white);
+  overflow: hidden;
+  flex-direction: row;
+  gap: 113px;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+  font-size: 40px;
+  color: var(--white);
+  font-family: var(--font-poppins);
+}
+
+
+/* Media queries for responsiveness */
+@media screen and (max-width: 1275px) {
+
+  .content,
+  .registration {
+    flex: 1;
+  }
+
+  .register {
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .content {
+    min-width: 100%;
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .tech-titans {
+    font-size: 32px;
+  }
+
+  .bg-parent {
+    padding: 241px 78px 248px;
+    box-sizing: border-box;
+  }
+
+  .registration {
+    padding-top: 164px;
+    box-sizing: border-box;
+  }
+
+  .register {
+    gap: 56px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .tech-titans {
+    font-size: 24px;
+  }
+
+  .bg-parent {
+    padding-left: var(--padding-xl);
+    padding-right: var(--padding-xl);
+    box-sizing: border-box;
+  }
+
+  .eg {
+    font-size: 21px;
+  }
+
+  .signup-parent {
+    gap: 30px;
+  }
+
+  .read-more-wrapper {
+    padding: 8px 22px;
+  }
+
+  .scan-your-fingerprint {
+    font-size: var(--font-size-sm);
+  }
+
+  .button {
+    padding: 14px 36px;
+  }
+
+  .register {
+    font-size: 32px;
+  }
+
+  .the-best-fingerprint {
+    font-size: var(--font-size-md);
+  }
+
+  .registration {
+    padding-top: 129px;
+    box-sizing: border-box;
+  }
+}

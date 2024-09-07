@@ -1,13 +1,21 @@
 from flask import request, jsonify
 from . import routes
-from utils.fingerprint_utils import enroll_fingerprint
+from utils.fingerprint_utils import start_fingerprint_enrollment, complete_fingerprint_enrollment
 
-@routes.route('/enroll-fingerprint', methods=['POST'])
-def enroll_fingerprint_route():
+@routes.route('/start-fingerprint-enrollment', methods=['POST'])
+def start_fingerprint_enrollment_route():
     full_name = request.form.get("full_name")
     email = request.form.get("email")
     password = request.form.get("password")
-    
-    response, status_code = enroll_fingerprint(full_name, email, password)
-    
+
+    # Initialize fingerprint enrollment
+    response, status_code = start_fingerprint_enrollment(full_name, email, password)
+
+    return jsonify(response), status_code
+
+@routes.route('/complete-fingerprint-enrollment', methods=['POST'])
+def complete_fingerprint_enrollment_route():
+    # Complete the fingerprint enrollment
+    response, status_code = complete_fingerprint_enrollment()
+
     return jsonify(response), status_code

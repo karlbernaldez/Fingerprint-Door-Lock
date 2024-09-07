@@ -13,10 +13,21 @@ try:
 except Exception as e:
     print(f"Error initializing fingerprint sensor: {e}")
 
-def enroll_fingerprint(full_name, email, password):
+# Global variable to hold user data during the enrollment process
+enrollment_data = {}
+
+def start_fingerprint_enrollment(full_name, email, password):
+    global enrollment_data
+
     try:
-        # Initialize the fingerprint sensor
-        print("Fingerprint sensor waiting...")
+        # Store user data for later use
+        enrollment_data = {
+            "full_name": full_name,
+            "email": email,
+            "password": password
+        }
+
+        print("Fingerprint sensor waiting for first scan...")
         
         while not f.readImage():
             pass
@@ -30,9 +41,25 @@ def enroll_fingerprint(full_name, email, password):
             print(message)
             return {"status": "failed", "message": message}, 409
 
-        print("Remove finger and place it again...")
-        time.sleep(2)
+        print("First scan successful. Please proceed with the second scan.")
+        return {"status": "success", "message": "First scan complete. Proceed with the second scan."}, 200
 
+    except Exception as e:
+        message = f"Operation failed! Exception message: {e}"
+        print(message)
+        return {"status": "failed", "message": message}, 500
+
+def complete_fingerprint_enrollment():
+    global enrollment_data
+
+    try:
+        # Ensure user data is available
+        if not enrollment_data:
+            message = "No enrollment data found. Please start the enrollment process."
+            return {"status": "failed", "message": message}, 400
+
+        print("Fingerprint sensor waiting for second scan...")
+        
         while not f.readImage():
             pass
 
@@ -47,10 +74,10 @@ def enroll_fingerprint(full_name, email, password):
         position_number = f.storeTemplate()
 
         # Hash the password and prepare the user data
-        hashed_password = generate_password_hash(password)
+        hashed_password = generate_password_hash(enrollment_data["password"])
         user_data = {
-            "full_name": full_name,
-            "email": email,
+            "full_name": enrollment_data["full_name"],
+            "email": enrollment_data["email"],
             "password": hashed_password,
             "fingerprint_id": Binary(pickle.dumps(f.downloadCharacteristics(0x01))),
             "template_position": position_number,
@@ -62,6 +89,10 @@ def enroll_fingerprint(full_name, email, password):
 
         message = f"Finger enrolled successfully at position #{position_number}."
         print(message)
+
+        # Clear the enrollment data
+        enrollment_data = {}
+
         return {"status": "success", "message": message, "position_number": position_number}, 201
 
     except DuplicateKeyError:

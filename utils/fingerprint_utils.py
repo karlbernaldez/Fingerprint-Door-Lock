@@ -26,6 +26,7 @@ def start_fingerprint_enrollment(full_name, email, password):
     try:
         # Store user data for later use
         enrollment_data = {
+            "user_id": User.generate_user_id(),
             "full_name": full_name,
             "email": email,
             "password": password
@@ -35,6 +36,8 @@ def start_fingerprint_enrollment(full_name, email, password):
         # Load your MP3 file
         pygame.mixer.music.load("./sounds/sensor_waiting.mp3")
         pygame.mixer.music.play()
+
+        time.sleep(.5)
 
         while not f.readImage():
             pass
@@ -49,7 +52,8 @@ def start_fingerprint_enrollment(full_name, email, password):
             # Load your MP3 file
             pygame.mixer.music.load("./sounds/already_exists.mp3")
             pygame.mixer.music.play()
-            
+            time.sleep(1)
+
             print(message)
             return {"status": "failed", "message": message}, 409
 
@@ -57,6 +61,7 @@ def start_fingerprint_enrollment(full_name, email, password):
         # Load your MP3 file
         pygame.mixer.music.load("./sounds/first_success.mp3")
         pygame.mixer.music.play()
+        time.sleep(3)
         return {"status": "success", "message": "First scan complete. Proceed with the second scan."}, 200
 
     except Exception as e:
@@ -93,6 +98,7 @@ def complete_fingerprint_enrollment():
         # Hash the password and prepare the user data
         hashed_password = generate_password_hash(enrollment_data["password"])
         user_data = {
+            "user_id": User.generate_user_id(),
             "full_name": enrollment_data["full_name"],
             "email": enrollment_data["email"],
             "password": hashed_password,

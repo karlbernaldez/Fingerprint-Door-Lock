@@ -1,5 +1,7 @@
 from flask_mongoengine import MongoEngine
 import datetime
+import random
+import string
 import jwt, os
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -9,6 +11,7 @@ db = MongoEngine()
 SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key')
 
 class User(db.Document):
+    user_id = db.StringField(required=True, unique=True)
     full_name = db.StringField(required=True)
     email = db.StringField(required=True, unique=True)
     password = db.StringField(required=True)
@@ -19,6 +22,9 @@ class User(db.Document):
     token = db.StringField()
     last_login = db.DateTimeField()
     role = db.StringField(choices=["ADMIN", "CLIENT"], default="CLIENT")
+
+    meta = {
+        'collection': 'fingerprints'}
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -54,3 +60,9 @@ class User(db.Document):
     def set_active(self, status):
         self.active = status
         self.save()
+
+    @staticmethod
+    def generate_user_id():
+        letters = ''.join(random.choices(string.ascii_uppercase, k=2))
+        numbers = ''.join(random.choices(string.digits, k=4))
+        return letters + numbers

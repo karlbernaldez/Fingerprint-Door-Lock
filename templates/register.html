@@ -183,36 +183,42 @@
             // Gather form data
             const formData = new FormData(document.getElementById('registrationForm'));
 
-            fetch('{{ url_for("routes.enroll_fingerprint_route") }}', {
+            fetch('{{ url_for("routes.start_fingerprint_enrollment_route") }}', {
                 method: 'POST',
                 body: formData // Send the form data along with the request
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert('Fingerprint enrolled successfully!');
-                        window.location.href = "{{ url_for('routes.register') }}"; // Redirect to login after success
-                    } else {
-                        alert('Enrollment failed: ' + data.message);
-                        if (data.message === 'Fingerprint already exists') {
-                            closeModal(); // Close the modal if the fingerprint is already enrolled
-                        }
-                        // Re-enable the button if there's an error
-                        button.disabled = false;
-                        button.style.backgroundColor = ''; // Reset to the original color
-                        button.textContent = 'Enroll Fingerprint'; // Reset the text
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again later.');
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Proceed with completion if start was successful
+                    return fetch('{{ url_for("routes.complete_fingerprint_enrollment_route") }}', {
+                        method: 'POST'
+                    });
+                } else {
+                    throw new Error('Enrollment failed: ' + data.message);
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Redirect to login or perform any success action
+                    alert('Fingerprint enrollment completed successfully!');
+                    window.location.href = '/login';
+                } else {
+                    throw new Error('Enrollment completion failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
 
-                    // Re-enable the button if there's an error
-                    button.disabled = false;
-                    button.style.backgroundColor = ''; // Reset to the original color
-                    button.textContent = 'Enroll Fingerprint'; // Reset the text
-                });
+                // Re-enable the button if there's an error
+                button.disabled = false;
+                button.style.backgroundColor = ''; // Reset to the original color
+                button.textContent = 'Enroll Fingerprint'; // Reset the text
+            });
         }
+
 
     </script>
 </body>

@@ -1,31 +1,24 @@
-from mongoengine import Document, StringField, BinaryField, IntField, DateTimeField, EmailField, BooleanField, EnumField
-from werkzeug.security import generate_password_hash, check_password_hash
-from bson import ObjectId
-from bson.binary import Binary
+from flask_mongoengine import MongoEngine
 import datetime
-import pickle
-import jwt
-import os
-from enum import Enum
+import jwt, os
+from werkzeug.security import generate_password_hash, check_password_hash
+
+db = MongoEngine()
 
 # Secret key for JWT token
 SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key')
 
-class RoleEnum(Enum):
-    ADMIN = 'admin'
-    CLIENT = 'client'
-
-class User(Document):
-    full_name = StringField(required=True, max_length=200)
-    email = EmailField(required=True, unique=True)
-    password = StringField(required=True)  # Hashed password
-    fingerprint_id = BinaryField(required=True)  # Storing the binary representation of the fingerprint template
-    template_position = IntField(required=True)  # Position in the fingerprint sensor
-    date = DateTimeField(default=datetime.datetime.utcnow)
-    active = BooleanField(default=False)  # Tracks if the user is currently logged in
-    token = StringField()  # JWT token for login sessions
-    last_login = DateTimeField()  # Tracks the last login time
-    role = EnumField(RoleEnum, required=True, default=RoleEnum.CLIENT)  # User role with default as CLIENT
+class User(db.Document):
+    full_name = db.StringField(required=True)
+    email = db.StringField(required=True, unique=True)
+    password = db.StringField(required=True)
+    fingerprint_id = db.BinaryField()
+    template_position = db.IntField()
+    date = db.DateTimeField(default=datetime.datetime.utcnow)
+    active = db.BooleanField(default=False)
+    token = db.StringField()
+    last_login = db.DateTimeField()
+    role = db.StringField(choices=["ADMIN", "CLIENT"], default="CLIENT")
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -33,25 +26,26 @@ class User(Document):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    def set_fingerprint(self, fingerprint):
-        self.fingerprint_id = Binary(pickle.dumps(fingerprint))
+    def set_fingerprint(self, fingerprint_data):
+        self.fingerprint_id = fingerprint_data
 
     def generate_token(self):
-        self.token = jwt.encode(
+        token = jwt.encode(
             {"email": self.email, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
             SECRET_KEY, algorithm="HS256"
-        ).decode('utf-8')
-        return self.token
+        )
+        self.token = token
+        self.save()  # Save the token to the database
+        return token
 
-    @staticmethod
-    def verify_token(token):
+    def verify_token(self, token):
         try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            return payload["email"]
+            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            return data
         except jwt.ExpiredSignatureError:
-            return None
+            return {"message": "Token expired"}
         except jwt.InvalidTokenError:
-            return None
+            return {"message": "Invalid token"}
 
     def update_last_login(self):
         self.last_login = datetime.datetime.utcnow()

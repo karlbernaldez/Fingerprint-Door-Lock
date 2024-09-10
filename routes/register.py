@@ -17,28 +17,18 @@ except Exception as e:
 
 @routes.route("/register", methods=["GET", "POST"])
 def register():
-    if request.method == "POST":
-        pass
-        # try:
-        #     full_name = request.form.get("full_name")
-        #     email = request.form.get("email")
-        #     password = request.form.get("password")
-        #     # Handle fingerprint enrollment
-        #     # ...
-        #     hashed_password = generate_password_hash(password)
-        #     user_data = {
-        #         "full_name": full_name,
-        #         "email": email,
-        #         "password": hashed_password,
-        #         "fingerprint_id": Binary(pickle.dumps(f.downloadCharacteristics(0x01))),
-        #         "template_position": template_position,
-        #         "date": datetime.utcnow()
-        #     }
-        #     User(**user_data).save()
-        #     flash("User registered successfully.", "success")
-        #     return redirect(url_for("routes.login"))
-        # except DuplicateKeyError:
-        #     flash("The given email already exists.", "danger")
-        # except Exception as error:
-        #     flash(f"An error occurred: {error}", "danger")
+    print("Received request at /register") 
+    # if request.method == "POST":
+    #     try:
+    #         full_name = request.form.get("full_name")
+    #         email = request.form.get("email")
+    #         password = request.form.get("password")
+    #         print(f"Form data: {full_name}, {email}, {password}")
+            
+    #         # Example response without database operations
+    #         flash("User registration simulated successfully.", "success")
+    #         return redirect(url_for("routes.login"))
+    #     except Exception as error:
+    #         print(f"An error occurred: {error}")
+    #         flash(f"An error occurred: {error}", "danger")
     return render_template("register.html")

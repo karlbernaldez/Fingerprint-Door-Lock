@@ -6,12 +6,16 @@ from pyfingerprint.pyfingerprint import PyFingerprint
 import pickle
 import time
 from datetime import datetime
+import pygame
 
 # Initialize fingerprint sensor
 try:
     f = PyFingerprint('/dev/serial0', 57600, 0xFFFFFFFF, 0x00000000)
 except Exception as e:
     print(f"Error initializing fingerprint sensor: {e}")
+
+# Initialize pygame mixer
+pygame.mixer.init(buffer=4096)
 
 # Global variable to hold user data during the enrollment process
 enrollment_data = {}
@@ -28,7 +32,10 @@ def start_fingerprint_enrollment(full_name, email, password):
         }
 
         print("Fingerprint sensor waiting for first scan...")
-        
+        # Load your MP3 file
+        pygame.mixer.music.load("./sounds/sensor_waiting.mp3")
+        pygame.mixer.music.play()
+
         while not f.readImage():
             pass
 
@@ -38,10 +45,18 @@ def start_fingerprint_enrollment(full_name, email, password):
         template_position = result[0]
         if template_position >= 0:
             message = f"This finger already exists at position #{template_position}."
+            
+            # Load your MP3 file
+            pygame.mixer.music.load("./sounds/already_exists.mp3")
+            pygame.mixer.music.play()
+            
             print(message)
             return {"status": "failed", "message": message}, 409
 
-        print("First scan successful. Please proceed with the second scan.")
+        print("First scan successful. Please remove your finger and proceed with the second scan.")
+        # Load your MP3 file
+        pygame.mixer.music.load("./sounds/first_success.mp3")
+        pygame.mixer.music.play()
         return {"status": "success", "message": "First scan complete. Proceed with the second scan."}, 200
 
     except Exception as e:
@@ -51,7 +66,7 @@ def start_fingerprint_enrollment(full_name, email, password):
 
 def complete_fingerprint_enrollment():
     global enrollment_data
-
+    time.sleep(2)
     try:
         # Ensure user data is available
         if not enrollment_data:
@@ -59,7 +74,9 @@ def complete_fingerprint_enrollment():
             return {"status": "failed", "message": message}, 400
 
         print("Fingerprint sensor waiting for second scan...")
-        
+        # Load your MP3 file
+        pygame.mixer.music.load("./sounds/second_scan.mp3")
+        pygame.mixer.music.play()
         while not f.readImage():
             pass
 
@@ -87,7 +104,10 @@ def complete_fingerprint_enrollment():
         # Store user information in MongoDB
         User(**user_data).save()
 
-        message = f"Finger enrolled successfully at position #{position_number}."
+        message = f"Fingerprint enrolled successfully at position #{position_number}."
+        # Load your MP3 file
+        pygame.mixer.music.load("./sounds/sucess.mp3")
+        pygame.mixer.music.play()
         print(message)
 
         # Clear the enrollment data

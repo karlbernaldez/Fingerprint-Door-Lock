@@ -3,7 +3,8 @@ from flask import Blueprint
 # Initialize the Blueprint
 routes = Blueprint('routes', __name__)
 
-# Import the different route modules
+print("Importing register module")
 from . import register
+
+print("Importing enroll_fingerprint module")
 from . import enroll_fingerprint
-    

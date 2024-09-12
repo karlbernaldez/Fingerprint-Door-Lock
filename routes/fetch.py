@@ -4,6 +4,8 @@ from models.logs import LoginLog
 from . import routes
 import base64
 
+
+# GET Route for fetching data of a specific user
 @routes.route('/user/<full_name>', methods=['GET'])
 def get_user_by_name(full_name):
     user = User.objects(full_name=full_name).first()
@@ -24,6 +26,7 @@ def get_user_by_name(full_name):
     else:
         return jsonify({'error': 'User not found'}), 404
 
+# GET route for getting all the users datas
 @routes.route('/users', methods=['GET'])
 def get_all_users():
     users = User.objects()
@@ -44,6 +47,7 @@ def get_all_users():
         })
     return jsonify(user_list)
 
+# GET route for fetching specific user data using fingerprint template position
 @routes.route('/user/template_position/<int:template_position>', methods=['GET'])
 def get_user_by_template_position(template_position):
     user = User.objects(template_position=template_position).first()
@@ -64,6 +68,7 @@ def get_user_by_template_position(template_position):
     else:
         return jsonify({'error': 'User not found'}), 404
 
+# GET route for fetching specific user data using user_id
 @routes.route('/user/id/<user_id>', methods=['GET'])
 def get_user_by_id(user_id):
     user = User.objects(user_id=user_id).first()
@@ -84,6 +89,7 @@ def get_user_by_id(user_id):
     else:
         return jsonify({'error': 'User not found'}), 404
 
+# GET route for fetching all the logs
 @routes.route('/logs', methods=['GET'])
 def get_all_login_logs():
     logs = LoginLog.objects()
@@ -99,6 +105,7 @@ def get_all_login_logs():
         })
     return jsonify(log_list)
 
+# GET route for fetching the logs of a specific user
 @routes.route('/user/<user_id>/login_logs', methods=['GET'])
 def get_login_logs_for_user(user_id):
     user = User.objects(user_id=user_id).first()

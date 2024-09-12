@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from models.users import User
+from models.logs import LoginLog
 from . import routes
 import base64
 
@@ -83,3 +84,35 @@ def get_user_by_id(user_id):
     else:
         return jsonify({'error': 'User not found'}), 404
 
+@routes.route('/logs', methods=['GET'])
+def get_all_login_logs():
+    logs = LoginLog.objects()
+    log_list = []
+    for log in logs:
+        log_list.append({
+            'user_id': log.user.user_id if log.user else None,
+            'full_name': log.full_name,
+            'login_method': log.login_method,
+            'login_time': log.login_time.isoformat() if log.login_time else None,
+            'logout_time': log.logout_time.isoformat() if log.logout_time else None,
+            'session_id': log.session_id
+        })
+    return jsonify(log_list)
+
+@routes.route('/user/<user_id>/login_logs', methods=['GET'])
+def get_login_logs_for_user(user_id):
+    user = User.objects(user_id=user_id).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    logs = LoginLog.objects(user=user)
+    log_list = []
+    for log in logs:
+        log_list.append({
+            'full_name': log.full_name,
+            'login_method': log.login_method,
+            'login_time': log.login_time.isoformat() if log.login_time else None,
+            'logout_time': log.logout_time.isoformat() if log.logout_time else None,
+            'session_id': log.session_id
+        })
+    return jsonify(log_list)

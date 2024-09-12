@@ -1,9 +1,10 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from models.users import User
 from models.logs import LoginLog
 from werkzeug.security import check_password_hash
 from . import routes
-import datetime
+from datetime import datetime, timedelta
+import jwt
 
 # Utility function to generate unique session IDs
 def generate_session_id():
@@ -56,10 +57,21 @@ def login_using_email():
 
     user = User.objects(email=email).first()
     if user and check_password_hash(user.password, password):
+         # Access the SECRET_KEY from Flask app's config
+        SECRET_KEY = current_app.config['SECRET_KEY']
+        # Generate a JWT token
+        token = jwt.encode({
+            'user_id': user.user_id,
+            'role': user.role,
+            'exp': datetime.utcnow() + timedelta(hours=1)  # Token expiry (1 hour)
+        }, SECRET_KEY, algorithm='HS256')
+
+
          # Update user fields
         user.active = True
-        user.last_login = datetime.datetime.utcnow()
+        user.last_login = datetime.utcnow()
         user.save()
+        user.token = token
          # Log the login event
         login_log = LoginLog(
             user=user,
@@ -70,6 +82,14 @@ def login_using_email():
         )
         login_log.save()
         
-        return jsonify(login_log)
+        return jsonify({
+            'message': 'Login successful',
+            "user": user,
+            "user_id": user.user_id,
+            "full_name": user.full_name,
+            "login_method": "EMAIL&PASSWORD",
+            "session_id": generate_session_id(),
+            'token': token,
+        })
     else:
         return jsonify({'error': 'Invalid email or password'}), 401

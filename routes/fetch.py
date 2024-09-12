@@ -62,3 +62,24 @@ def get_user_by_template_position(template_position):
         })
     else:
         return jsonify({'error': 'User not found'}), 404
+
+@routes.route('/user/id/<user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+    user = User.objects(user_id=user_id).first()
+    if user:
+        return jsonify({
+            'user_id': user.user_id,
+            'full_name': user.full_name,
+            'email': user.email,
+            'password': user.password,
+            'fingerprint_id': base64.b64encode(user.fingerprint_id).decode('utf-8') if user.fingerprint_id else None,
+            'template_position': user.template_position,
+            'date': user.date.isoformat(),
+            'active': user.active,
+            'token': user.token,
+            'last_login': user.last_login.isoformat() if user.last_login else None,
+            'role': user.role
+        })
+    else:
+        return jsonify({'error': 'User not found'}), 404
+

@@ -6,7 +6,10 @@ from pyfingerprint.pyfingerprint import PyFingerprint
 import pickle
 import time
 from datetime import datetime
-import pygame
+import pygame, os
+
+#For testing only disable this if deploying
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 # Initialize fingerprint sensor
 try:
@@ -15,7 +18,7 @@ except Exception as e:
     print(f"Error initializing fingerprint sensor: {e}")
 
 # Initialize pygame mixer
-pygame.mixer.init(buffer=4096)
+#pygame.mixer.init(buffer=4096)
 
 # Global variable to hold user data during the enrollment process
 enrollment_data = {}

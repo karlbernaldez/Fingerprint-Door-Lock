@@ -4,6 +4,14 @@ from utils.fingerprint_utils import start_fingerprint_enrollment, complete_finge
 
 @routes.route('/start-fingerprint-enrollment', methods=['POST'])
 def start_fingerprint_enrollment_route():
+
+    #Sample Payload
+    # {
+    # "full_name": "John Doe",
+    # "email": "john.doe@example.com",
+    # "password": "securepassword123"
+    # }
+
     full_name = request.form.get("full_name")
     email = request.form.get("email")
     password = request.form.get("password")

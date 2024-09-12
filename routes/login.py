@@ -44,6 +44,7 @@ def login_using_fingerprint():
     else:
         return jsonify({'error': 'Invalid fingerprint or template position'}), 401
 
+# Login route using email and password
 @routes.route('/login', methods=['POST'])
 def login_using_email():
     data = request.get_json()

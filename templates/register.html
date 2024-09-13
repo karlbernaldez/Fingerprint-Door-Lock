@@ -66,7 +66,7 @@
             <div class="bg-parent">
                 <div class="bg"></div>
                 <div class="finance-info">
-                    <h1 class="tech-titans">Tech Titans</h1>
+                    <h1 class="tech-titans">AdoVelopers</h1>
                     <div class="the-best-fingerprint">The best fingerprint locked door.</div>
                 </div>
                 <button class="read-more-wrapper">
@@ -118,6 +118,19 @@
     </div>
 
     <script>
+
+        // Listen for keydown events on the entire form
+        document.getElementById('registrationForm').addEventListener('keydown', function (event) {
+            // Check if the Enter key was pressed
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent the default form submission behavior
+                const registerButton = document.getElementById('registerButton');
+                if (!registerButton.disabled) {
+                    registerButton.click(); // Trigger the button click programmatically
+                }
+            }
+        });
+
         document.getElementById('registrationForm').addEventListener('input', function () {
             const form = this;
             const emailField = form.querySelector('input[name="email"]');
@@ -187,36 +200,36 @@
                 method: 'POST',
                 body: formData // Send the form data along with the request
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Proceed with completion if start was successful
-                    return fetch('{{ url_for("routes.complete_fingerprint_enrollment_route") }}', {
-                        method: 'POST'
-                    });
-                } else {
-                    throw new Error('Enrollment failed: ' + data.message);
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Redirect to login or perform any success action
-                    alert('Fingerprint enrollment completed successfully!');
-                    window.location.href = '/login';
-                } else {
-                    throw new Error('Enrollment completion failed: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert(error.message);
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Proceed with completion if start was successful
+                        return fetch('{{ url_for("routes.complete_fingerprint_enrollment_route") }}', {
+                            method: 'POST'
+                        });
+                    } else {
+                        throw new Error('Enrollment failed: ' + data.message);
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Redirect to login or perform any success action
+                        alert('Fingerprint enrollment completed successfully!');
+                        window.location.href = '/login';
+                    } else {
+                        throw new Error('Enrollment completion failed: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message);
 
-                // Re-enable the button if there's an error
-                button.disabled = false;
-                button.style.backgroundColor = ''; // Reset to the original color
-                button.textContent = 'Enroll Fingerprint'; // Reset the text
-            });
+                    // Re-enable the button if there's an error
+                    button.disabled = false;
+                    button.style.backgroundColor = ''; // Reset to the original color
+                    button.textContent = 'Enroll Fingerprint'; // Reset the text
+                });
         }
 
 

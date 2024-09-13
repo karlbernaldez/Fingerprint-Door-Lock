@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1, width=device-width" />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='logout.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='lglobal.css') }}" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus Jakarta Sans:wght@600&display=swap" />
+</head>
+
+<body>
+  <div class="logout">
+    <div class="frame-parent">
+      <img class="frame-child" loading="lazy" alt="" src="{{ url_for('static', filename='public/group-2.svg') }}" />
+
+      <div class="bg-parent">
+        <div class="bg"></div>
+        <div class="adovelopers-content">
+          <b class="adovelopers">AdoVelopers</b>
+          <div class="the-best-fingerprint">
+            The best fingerprint locked door.
+          </div>
+        </div>
+        <button class="read-more-wrapper">
+          <a class="read-more">Read More</a>
+        </button>
+      </div>
+    </div>
+    <div class="logout-inner">
+      <div class="toolbar-content-parent">
+        <div class="toolbar-content">
+          <div class="toolbar">
+            <div class="toolbar-title">
+              <div class="labels">
+                <div class="title">Enter USER ID to Logout</div>
+              </div>
+            </div>
+            <div class="title1">Please input your user id to logout.</div>
+          </div>
+        </div>
+
+        <div class="user-id-inputs">
+          <input class="user-id-input" maxlength="1" data-type="letter" />
+          <input class="user-id-input" maxlength="1" data-type="letter" />
+          <input class="user-id-input" maxlength="1" data-type="number" />
+          <input class="user-id-input" maxlength="1" data-type="number" />
+          <input class="user-id-input" maxlength="1" data-type="number" />
+          <input class="user-id-input" maxlength="1" data-type="number" />
+        </div>
+
+        <button class="log-in">
+          <img class="icon" alt="" src="{{ url_for('static', filename='public/icon.svg') }}" />
+
+          <div class="button" id="logoutDiv">Log Out</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const inputs = document.querySelectorAll('.user-id-input');
+
+    // Add an event listener to each input for validation
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', function () {
+        if (this.dataset.type === 'letter') {
+          // Allow only letters and convert to uppercase
+          this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+        } else if (this.dataset.type === 'number') {
+          // Allow only numbers
+          this.value = this.value.replace(/[^0-9]/g, '');
+        }
+
+        // Move to the next input if the current input is filled
+        if (this.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      // Move back to the previous input on backspace
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+
+    // Function to handle logout
+    function handleLogout() {
+      fetch('/logging_out', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: Array.from(inputs).map(input => input.value).join('') // Collect user ID from inputs
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message === 'Logout successful') {
+            alert('Logout successful!');
+            // Redirect to login page or homepage
+            window.location.href = '/login';
+          } else {
+            alert('Logout failed: ' + data.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while logging out.');
+        });
+    }
+
+    // Event listener for logout button click
+    document.getElementById('logoutDiv').addEventListener('click', handleLogout);
+
+    // Event listener for "Enter" key press
+    document.addEventListener('keydown', function (event) {
+      // Check if the Enter key is pressed
+      if (event.key === 'Enter') {
+        handleLogout();
+      }
+    });
+  </script>
+
+</body>
+
+</html>

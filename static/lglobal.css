@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+  line-height: normal;
+}
+
+:root {
+  /* fonts */
+  --button-primary-text: "Plus Jakarta Sans";
+  --material-theme-body-small: Roboto;
+  --font-poppins: Poppins;
+
+  /* font sizes */
+  --button-primary-text-size: 16px;
+  --material-theme-body-small-size: 12px;
+  --material-theme-display-small-size: 36px;
+  --font-size-3xl: 22px;
+  --font-size-10xl: 29px;
+  --material-theme-headline-small-size: 24px;
+
+  /* Colors */
+  --primary-contrast: #fff;
+  --primary-light: #1676f3;
+  --material-theme-sys-light-on-surface-variant: #52443b;
+  --material-theme-sys-light-on-surface: #201a17;
+
+  /* Gaps */
+  --gap-9xs: 4px;
+
+  /* Paddings */
+  --padding-xl: 20px;
+  --padding-5xs: 8px;
+}

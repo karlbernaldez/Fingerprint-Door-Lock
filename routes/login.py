@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, render_template
 from models.users import User
 from models.logs import LoginLog
 from werkzeug.security import check_password_hash
@@ -6,10 +6,15 @@ from . import routes
 from datetime import datetime, timedelta
 import jwt
 
+
 # Utility function to generate unique session IDs
 def generate_session_id():
     import uuid
     return str(uuid.uuid4())
+
+@routes.route('/login')
+def login():
+    return render_template('login.html')
 
 # Route for login using fingerprint template position
 @routes.route('/login/fingerprint', methods=['POST'])
@@ -46,7 +51,7 @@ def login_using_fingerprint():
         return jsonify({'error': 'Invalid fingerprint or template position'}), 401
 
 # Login route using email and password
-@routes.route('/login', methods=['POST'])
+@routes.route('/logging_in', methods=['POST'])
 def login_using_email():
     data = request.get_json()
     email = data.get('email')

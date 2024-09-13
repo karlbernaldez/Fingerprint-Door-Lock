@@ -1,0 +1,49 @@
+body {
+  margin: 0;
+  line-height: normal;
+}
+
+:root {
+  /* fonts */
+  --tertiary-action-text: "Plus Jakarta Sans";
+  --font-inter: Inter;
+  --font-poppins: Poppins;
+
+  /* font sizes */
+  --tertiary-action-text-size: 13px;
+  --button-primary-text-size: 16px;
+  --input-field-size: 14px;
+  --field-label-size: 12px;
+  --heading-3-size: 22px;
+  --font-size-lg: 18px;
+
+  /* Colors */
+  --primary-contrast: #fff;
+  --primary-text-light: #1676f3;
+  --color-black: #000;
+  --contrast-30-light: rgba(28, 52, 84, 0.26);
+  --contrast-20-light: rgba(28, 55, 90, 0.16);
+  --contrast-70-light: rgba(27, 43, 65, 0.72);
+  --contrast-80-light: rgba(26, 41, 61, 0.83);
+  --body-text-light: rgba(24, 39, 58, 0.94);
+
+  /* Gaps */
+  --gap-base: 16px;
+  --gap-9xs: 4px;
+  --gap-xl: 20px;
+  --gap-8xs: 5px;
+
+  /* Paddings */
+  --padding-xl: 20px;
+  --padding-mid-5: 17.5px;
+  --padding-12xs: 1px;
+  --padding-sm: 14px;
+  --padding-mini: 15px;
+  --padding-smi: 13px;
+  --padding-6xs: 7px;
+  --padding-5xs: 8px;
+
+  /* Border radiuses */
+  --br-9xs: 4px;
+  --br-10xs: 3px;
+}

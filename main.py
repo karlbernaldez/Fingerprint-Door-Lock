@@ -3,10 +3,10 @@ from flask import Flask
 from flask_mongoengine import MongoEngine
 from routes import routes  # Import the routes Blueprint
 
-
-
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = "8c46f38b7d4f5a8e83b1e93a6e26d6c5bb149b1ac8dcd5a64b9d7a2e7b3e23c1"
+app.config['SECRET_KEY'] = '8c46f38b7d4f5a8e83b1e93a6e26d6c5bb149b1ac8dcd5a64b9d7a2e7b3e23c1'
+
 
 # # Initialize MongoDB
 # connection_string = os.getenv("MONGODB_URI", "mongodb+srv://fingerprint_db:admin1234@thesis.ro0a8.mongodb.net/?retryWrites=true&w=majority&appName=Thesis")
@@ -16,8 +16,9 @@ app.secret_key = os.urandom(24)
 # Configure MongoEngine
 app.config['MONGODB_SETTINGS'] = {
     'db': 'fingerprints',
-    'host': os.getenv('MONGODB_URI', 'mongodb+srv://fingerprint_db:admin1234@thesis.ro0a8.mongodb.net/?retryWrites=true&w=majority&appName=Thesis'),
-    'alias': 'default'
+    'host':'mongodb+srv://fingerprint_db:admin1234@thesis.ro0a8.mongodb.net/?retryWrites=true&w=majority&appName=Thesis',
+    'alias': 'default',
+    'tls': True,
 }
 
 # Initialize MongoEngine with the app
@@ -36,4 +37,4 @@ db.init_app(app)
 app.register_blueprint(routes)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8000)
+    app.run(host="0.0.0.0", debug=True, port=8000)

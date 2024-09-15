@@ -22,9 +22,7 @@
         <div class="bg"></div>
         <div class="app-name">
           <h1 class="adovelopers">AdoVelopers</h1>
-          <div class="the-best-fingerprint">
-            The best fingerprint locked door.
-          </div>
+          <div class="the-best-fingerprint">The best fingerprint locked door.</div>
         </div>
         <button class="read-more">
           <a class="read-more1">Read More</a>
@@ -32,13 +30,12 @@
       </div>
     </div>
     <img class="billboard-2-icon" alt="" src="{{ url_for('static', filename='./public/billboard-2@2x.png') }}" />
-
     <img class="pngwing-1-icon" alt="" src="{{ url_for('static', filename='./public/pngwing-1@2x.png') }}" />
 
     <div class="logo-name">LOGO NAME</div>
     <div class="login">
       <div class="login-form-container">
-        <form class="login-options">
+        <form id="login-form" class="login-options">
           <div class="fingerprint-login">
             <img class="group-icon" loading="lazy" alt=""
               src="{{ url_for('static', filename='./public/group-1.svg') }}" />
@@ -48,9 +45,7 @@
               <div class="login-instruction">
                 <h3 class="log-in-to">Log in to your Account</h3>
               </div>
-              <div class="place-your-registered">
-                Place your registered fingerprint on the sensor.
-              </div>
+              <div class="place-your-registered">Place your registered fingerprint on the sensor.</div>
             </div>
           </div>
           <div class="social-login">
@@ -60,7 +55,6 @@
                   src="{{ url_for('static', filename='./public/group-1.svg') }}" />
               </div>
               <img class="icon" alt="" src="{{ url_for('static', filename='./public/icon.svg') }}" />
-
               <div class="continue-with-touch">Continue with Touch ID</div>
             </div>
             <div class="email-login">
@@ -82,9 +76,11 @@
               </div>
               <div class="email-value">
                 <div class="field"></div>
-                <input class="johndoegmailcom" placeholder="johndoe@gmail.com" type="text" />
+                <input id="email" class="johndoegmailcom" placeholder="johndoe@gmail.com" type="text" />
+                <small id="email-error" style="color:red; display:none;">Please enter a valid email address.</small>
               </div>
             </div>
+
             <div class="password-input">
               <div class="password-input-container">
                 <div class="password">Password</div>
@@ -92,34 +88,36 @@
               <div class="password-value">
                 <div class="field1"></div>
                 <div class="password-dots">
-                  <input class="input" placeholder="•••••••••••" type="text" />
-
-                  <div class="div">•••••••••••</div>
-                </div>
-                <div class="password-visibility">
-                  <img class="eye-icon" alt="" src="{{ url_for('static', filename='./public/eye.svg') }}" />
-
-                  <!-- <img class="eye-disabled-icon" alt=""
-                    src="{{ url_for('static', filename='./public/eye-disabled.svg') }}" /> -->
+                  <input id="password" class="input" placeholder="•••••••••••" type="password" />
+                  <div class="password-visibility">
+                    <!-- Show eye (hidden password) -->
+                    <img id="eye-icon" class="eye-icon" alt="Show Password"
+                      src="{{ url_for('static', filename='./public/eye.svg') }}" onclick="togglePasswordVisibility()" />
+                    <!-- Hide eye (visible password), hidden by default -->
+                    <img id="eye-disabled-icon" class="eye-disabled-icon" alt="Hide Password"
+                      src="{{ url_for('static', filename='./public/eyes.svg') }}" onclick="togglePasswordVisibility()"
+                      style="display: none;" />
+                  </div>
                 </div>
               </div>
             </div>
+
             <div class="remember-forgot-password">
               <div class="remember-password">
                 <div class="remember-me-checkbox">
-                  <input class="checkbox" type="checkbox" />
+                  <input id="remember-me" class="checkbox" type="checkbox" />
                 </div>
                 <div class="remember-me">Remember me</div>
               </div>
               <div class="forgot-password">Forgot Password?</div>
             </div>
-          </div>
-          <button class="log-in">
-            <img class="icon1" alt="" src="{{ url_for('static', filename='./public/icon.svg') }}" />
 
-            <div class="button">Log in</div>
-          </button>
+            <button type="submit" class="log-in">
+              <img class="icon1" alt="" src="{{ url_for('static', filename='./public/icon.svg') }}" />
+              <div class="button">Log in</div>
+            </button>
         </form>
+
         <div class="signup">
           <div class="signup-prompt">
             <div class="dont-have-an">Don’t have an account?</div>
@@ -130,5 +128,78 @@
     </div>
   </div>
 </body>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  function togglePasswordVisibility() {
+    const passwordField = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeDisabledIcon = document.getElementById('eye-disabled-icon');
+
+    if (passwordField.type === "password") {
+      // Show password
+      passwordField.type = "text";
+      // Toggle icons
+      eyeIcon.style.display = 'none';
+      eyeDisabledIcon.style.display = 'block';
+    } else {
+      // Hide password
+      passwordField.type = "password";
+      // Toggle icons
+      eyeIcon.style.display = 'block';
+      eyeDisabledIcon.style.display = 'none';
+    }
+  }
+
+  function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  }
+
+  document.getElementById('login-form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Capture form data
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const rememberMe = document.getElementById('remember-me').checked;
+
+    // Perform email validation
+    if (!validateEmail(email)) {
+      document.getElementById('email-error').style.display = 'block';
+      return;
+    } else {
+      document.getElementById('email-error').style.display = 'none';
+    }
+
+    // Perform basic validation
+    if (!email || !password) {
+      alert("Email and Password are required.");
+      return;
+    }
+
+    // Create the payload to be sent in the POST request
+    const data = {
+      email: email,
+      password: password,
+      rememberMe: rememberMe
+    };
+
+    // Send a POST request to the Flask login route using Axios
+    axios.post('/logging_in', data)
+      .then(function (response) {
+        // Handle the server response
+        if (response.data.message === 'SUCCESS') {
+          alert("Login successful");
+          window.location.href = '/register';
+        }else {
+          alert("Login failed: " + response.data.message);
+        }
+      })
+      .catch(function (error) {
+        console.error('Error:', error);
+      });
+  });
+</script>
 
 </html>

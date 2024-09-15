@@ -80,6 +80,7 @@ def login_using_email():
          # Log the login event
         login_log = LoginLog(
             user=user,
+            login_time=datetime.utcnow(),
             user_id=user.user_id,
             full_name=user.full_name,
             login_method="EMAIL&PASSWORD",
@@ -88,7 +89,7 @@ def login_using_email():
         login_log.save()
         
         return jsonify({
-            'message': 'Login successful',
+            'message': 'SUCCESS',
             "user": user,
             "user_id": user.user_id,
             "full_name": user.full_name,

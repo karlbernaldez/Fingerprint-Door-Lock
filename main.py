@@ -18,7 +18,9 @@ app.config['MONGODB_SETTINGS'] = {
     'db': 'fingerprints',
     'host':'mongodb+srv://fingerprint_db:admin1234@thesis.ro0a8.mongodb.net/?retryWrites=true&w=majority&appName=Thesis',
     'alias': 'default',
-    'tls': True,
+    'connect': False,
+    'tls': True,  # Enable TLS
+    'tlsAllowInvalidCertificates': False
 }
 
 # Initialize MongoEngine with the app

@@ -11,9 +11,59 @@
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Plus Jakarta Sans:wght@400;500;600&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" />
+  <style>
+    /* The Modal (background) */
+    .modal {
+      display: none;
+      /* Hidden by default */
+      position: fixed;
+      /* Stay in place */
+      z-index: 1;
+      /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%;
+      /* Full width */
+      height: 100%;
+      /* Full height */
+      overflow: auto;
+      /* Enable scroll if needed */
+      background-color: rgb(0, 0, 0);
+      /* Fallback color */
+      background-color: rgba(0, 0, 0, 0.4);
+      /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      /* 15% from the top and centered */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      /* Could be more or less, depending on screen size */
+    }
+
+    /* The Close Button */
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
+
   <div class="buttonless">
     <div class="content">
       <img class="content-child" loading="lazy" alt="" src="{{ url_for('static', filename='./public/group-2.svg') }}" />
@@ -127,79 +177,130 @@
       </div>
     </div>
   </div>
-</body>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-  function togglePasswordVisibility() {
-    const passwordField = document.getElementById('password');
-    const eyeIcon = document.getElementById('eye-icon');
-    const eyeDisabledIcon = document.getElementById('eye-disabled-icon');
+  <!-- Modal HTML -->
+  <div id="welcomeModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <p id="welcomeMessage"></p>
+    </div>
+  </div>
 
-    if (passwordField.type === "password") {
-      // Show password
-      passwordField.type = "text";
-      // Toggle icons
-      eyeIcon.style.display = 'none';
-      eyeDisabledIcon.style.display = 'block';
-    } else {
-      // Hide password
-      passwordField.type = "password";
-      // Toggle icons
-      eyeIcon.style.display = 'block';
-      eyeDisabledIcon.style.display = 'none';
-    }
-  }
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    async function checkFingerprint() {
+      try {
+        const response = await fetch('/login/fingerprint', {
+          method: 'POST', // Changed to POST
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ /* any data you might need */ })
+        });
 
-  function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(String(email).toLowerCase());
-  }
+        const data = await response.json();
 
-  document.getElementById('login-form').addEventListener('submit', function (event) {
-    event.preventDefault(); // Prevent the default form submission
-
-    // Capture form data
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const rememberMe = document.getElementById('remember-me').checked;
-
-    // Perform email validation
-    if (!validateEmail(email)) {
-      document.getElementById('email-error').style.display = 'block';
-      return;
-    } else {
-      document.getElementById('email-error').style.display = 'none';
-    }
-
-    // Perform basic validation
-    if (!email || !password) {
-      alert("Email and Password are required.");
-      return;
-    }
-
-    // Create the payload to be sent in the POST request
-    const data = {
-      email: email,
-      password: password,
-      rememberMe: rememberMe
-    };
-
-    // Send a POST request to the Flask login route using Axios
-    axios.post('/logging_in', data)
-      .then(function (response) {
-        // Handle the server response
-        if (response.data.message === 'SUCCESS') {
-          alert("Login successful");
-          window.location.href = '/register';
-        }else {
-          alert("Login failed: " + response.data.message);
+        if (data.message === 'Login successful') {
+          document.getElementById('status').innerText = "Fingerprint Verified!";
+          // Show the modal with the user's name
+          showModal(data.full_name);
+          clearInterval(polling);
+          // Redirect or take another action after success
+          window.location.href = "/dashboard";  // Example redirect
+        } else {
+          document.getElementById('status').innerText = "Waiting for fingerprint verification...";
         }
-      })
-      .catch(function (error) {
-        console.error('Error:', error);
-      });
-  });
-</script>
+      } catch (error) {
+        console.error("Error checking fingerprint status:", error);
+      }
+    }
+
+    // Polling for fingerprint verification status
+    const polling = setInterval(checkFingerprint, 5000); // Adjust interval as needed
+
+    function togglePasswordVisibility() {
+      const passwordField = document.getElementById('password');
+      const eyeIcon = document.getElementById('eye-icon');
+      const eyeDisabledIcon = document.getElementById('eye-disabled-icon');
+
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        eyeIcon.style.display = 'none';
+        eyeDisabledIcon.style.display = 'block';
+      } else {
+        passwordField.type = "password";
+        eyeIcon.style.display = 'block';
+        eyeDisabledIcon.style.display = 'none';
+      }
+    }
+
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(String(email).toLowerCase());
+    }
+
+    function showModal(userName) {
+      const modal = document.getElementById('welcomeModal');
+      const welcomeMessage = document.getElementById('welcomeMessage');
+      const span = document.getElementsByClassName('close')[0];
+
+      welcomeMessage.innerText = `Welcome to Mobile Legends ${userName}`;
+      modal.style.display = 'block';
+
+      setTimeout(function () {
+        modal.style.display = 'none';
+      }, 5000);
+
+      span.onclick = function () {
+        modal.style.display = 'none';
+      }
+
+      window.onclick = function (event) {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      }
+    }
+
+    document.getElementById('login-form').addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent the default form submission
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const rememberMe = document.getElementById('remember-me').checked;
+
+      if (!validateEmail(email)) {
+        document.getElementById('email-error').style.display = 'block';
+        return;
+      } else {
+        document.getElementById('email-error').style.display = 'none';
+      }
+
+      if (!email || !password) {
+        alert("Email and Password are required.");
+        return;
+      }
+
+      const data = {
+        email: email,
+        password: password,
+        rememberMe: rememberMe
+      };
+
+      axios.post('/logging_in', data)
+        .then(function (response) {
+          if (response.data.message === 'SUCCESS') {
+            alert("Login successful");
+            window.location.href = '/register';
+          } else {
+            alert("Login failed: " + response.data.message);
+          }
+        })
+        .catch(function (error) {
+          console.error('Error:', error);
+        });
+    });
+  </script>
+</body>
 
 </html>

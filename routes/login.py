@@ -5,7 +5,20 @@ from werkzeug.security import check_password_hash
 from . import routes
 from datetime import datetime, timedelta
 import jwt
+from pyfingerprint.pyfingerprint import PyFingerprint
+from time import sleep
+from utils import fingerprint_utils
+import pyttsx3
+from utils import tts as Text2Speech
+import pygame
 
+
+# Initialize the TTS engine
+engine = pyttsx3.init()
+
+# Set properties (optional)
+engine.setProperty('rate', 150)  # Speed of speech
+engine.setProperty('volume', 1)  # Volume level (0.0 to 1.0)
 
 # Utility function to generate unique session IDs
 def generate_session_id():
@@ -19,36 +32,45 @@ def login():
 # Route for login using fingerprint template position
 @routes.route('/login/fingerprint', methods=['POST'])
 def login_using_fingerprint():
-    data = request.get_json()
-    template_position = data.get('template_position')
-    
-    if not template_position:
-        return jsonify({'error': 'Template position and fingerprint ID are required'}), 400
+    # Call the check_fingerprint function to check for a fingerprint match
+    is_matched, template_position, accuracy_score = fingerprint_utils.check_fingerprint()
 
-    user = User.objects(template_position=template_position).first()
-    if user:
-        # Update user fields
-        user.active = True
-        user.last_login = datetime.datetime.utcnow()
-        user.save()
-        
-        # Log the login event
-        login_log = LoginLog(
-            user=user,
-            full_name=user.full_name,
-            login_method="FINGERPRINT",
-            session_id=generate_session_id()  # Implement this function to generate unique session IDs
-        )
-        login_log.save()
-        
-        return jsonify({
-            'message': 'Login successful',
-            'user_id': user.user_id,
-            'full_name': user.full_name,
-            'role': user.role
-        })
+    if is_matched:
+        user = User.objects(template_position=template_position).first()
+
+        if user:
+            welcome = Text2Speech.text_to_speech_file(f"Welcome to Mobile Legends {user.full_name}")
+            pygame.mixer.music.load(welcome)
+            pygame.mixer.music.play()
+            # Update user fields
+            user.active = True
+            user.last_login = datetime.utcnow()
+            user.save()
+
+            # Log the login event
+            login_log = LoginLog(
+                user=user,
+                full_name=user.full_name,
+                login_method="FINGERPRINT",
+                session_id=generate_session_id(),  # Implement this function to generate unique session IDs
+                user_id=user.user_id  # Ensure this field is populated
+            )
+            login_log.save()
+            print("LOGIN SAVED")
+            return jsonify({
+                'message': 'Login successful',
+                'user_id': user.user_id,
+                'full_name': user.full_name,
+                'role': user.role,
+                'matching_score': accuracy_score  # Include the matching score
+            })
+        else:
+            return jsonify({'error': 'Invalid fingerprint or template position'}), 401
     else:
-        return jsonify({'error': 'Invalid fingerprint or template position'}), 401
+        return jsonify({
+            'error': 'Fingerprint not matched',
+            'matching_score': accuracy_score  # Include score even if no match
+        }), 401
 
 # Login route using email and password
 @routes.route('/logging_in', methods=['POST'])
@@ -77,6 +99,9 @@ def login_using_email():
         user.last_login = datetime.utcnow()
         user.save()
         user.token = token
+        welcome = Text2Speech.text_to_speech_file(f"Welcome to Mobile Legends {user.full_name}")
+        pygame.mixer.music.load(welcome)
+        pygame.mixer.music.play()
          # Log the login event
         login_log = LoginLog(
             user=user,

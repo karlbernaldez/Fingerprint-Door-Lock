@@ -3,7 +3,9 @@ Jinja2==3.1.2
 Werkzeug==2.0.3
 pymongo~=4.3.3
 mongoengine
-Adafruit-Blinkapip
 pyfingerprint
 jwt
 pygame
+flask-mongoengine
+pyttsx3
+elevenlabs

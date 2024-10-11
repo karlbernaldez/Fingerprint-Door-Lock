@@ -19,6 +19,7 @@ class User(db.Document):
     template_position = db.IntField()
     date = db.DateTimeField(default=datetime.datetime.utcnow)
     active = db.BooleanField(default=False)
+    verified = db.BooleanField(default=False)
     token = db.StringField()
     last_login = db.DateTimeField()
     role = db.StringField(choices=["ADMIN", "CLIENT"], default="CLIENT")

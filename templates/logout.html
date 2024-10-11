@@ -62,36 +62,37 @@
   </div>
 
   <script>
-    const inputs = document.querySelectorAll('.user-id-input');
+  const inputs = document.querySelectorAll('.user-id-input');
 
-    // Add an event listener to each input for validation
-    inputs.forEach((input, index) => {
-      input.addEventListener('input', function () {
-        if (this.dataset.type === 'letter') {
-          // Allow only letters and convert to uppercase
-          this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
-        } else if (this.dataset.type === 'number') {
-          // Allow only numbers
-          this.value = this.value.replace(/[^0-9]/g, '');
-        }
+  // Add an event listener to each input for validation
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', function () {
+      if (this.dataset.type === 'letter') {
+        // Allow only letters and convert to uppercase
+        this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+      } else if (this.dataset.type === 'number') {
+        // Allow only numbers
+        this.value = this.value.replace(/[^0-9]/g, '');
+      }
 
-        // Move to the next input if the current input is filled
-        if (this.value.length === 1 && index < inputs.length - 1) {
-          inputs[index + 1].focus();
-        }
-      });
-
-      // Move back to the previous input on backspace
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && !e.target.value && index > 0) {
-          inputs[index - 1].focus();
-        }
-      });
+      // Move to the next input if the current input is filled
+      if (this.value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
     });
 
-    // Function to handle logout
-    function handleLogout() {
-      fetch('/logging_out', {
+    // Move back to the previous input on backspace
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !e.target.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
+
+  // Function to handle logout using async/await
+  async function handleLogout() {
+    try {
+      const response = await fetch('/logging_out', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -99,34 +100,34 @@
         body: JSON.stringify({
           user_id: Array.from(inputs).map(input => input.value).join('') // Collect user ID from inputs
         })
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.message === 'Logout successful') {
-            alert('Logout successful!');
-            // Redirect to login page or homepage
-            window.location.href = '/logout';
-          } else {
-            alert('Logout failed: ' + data.error);
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred while logging out.');
-        });
-    }
+      });
 
-    // Event listener for logout button click
-    document.getElementById('logoutDiv').addEventListener('click', handleLogout);
+      const data = await response.json();
 
-    // Event listener for "Enter" key press
-    document.addEventListener('keydown', function (event) {
-      // Check if the Enter key is pressed
-      if (event.key === 'Enter') {
-        handleLogout();
+      if (data.message === 'Logout successful') {
+        alert('Logout successful!');
+        // Redirect to login page or homepage
+        window.location.href = '/logout';
+      } else {
+        alert('Logout failed: ' + data.error);
       }
-    });
-  </script>
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred while logging out.');
+    }
+  }
+
+  // Event listener for logout button click
+  document.getElementById('logoutDiv').addEventListener('click', handleLogout);
+
+  // Event listener for "Enter" key press
+  document.addEventListener('keydown', function (event) {
+    // Check if the Enter key is pressed
+    if (event.key === 'Enter') {
+      handleLogout();
+    }
+  });
+</script>
 
 </body>
 

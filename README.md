@@ -81,7 +81,7 @@ To set up your Raspberry Pi headless (without a monitor) and manage it via SSH, 
    - Once connected, you can open a folder, edit code, and interact with the Raspberry Pi as if you were working on it locally.
 
 
-
+ 
 
 ## Installation
 
